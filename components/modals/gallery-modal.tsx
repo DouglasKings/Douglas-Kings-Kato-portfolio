@@ -166,7 +166,7 @@ export default function GalleryModal({ language, onClose }: GalleryModalProps) {
           de: "Ein professionelles Portfolio, das juristisches Fachwissen und akademische Leistungen präsentiert.",
         },
         src: "/assets/images/4.png",
-        link: "https://damien-portfolio-chi.vercel.app/",
+        link: "https://damien-portfolio-nine.vercel.app/",
       },
       {
         type: "image",
