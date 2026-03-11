@@ -17,6 +17,19 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    /**
+     * ✅ FIX: typescript-config/consistent-casing warning
+     *
+     * WHY: On case-insensitive file systems (Windows / macOS), you can import
+     *      a file as "MyComponent" even if it's saved as "mycomponent.tsx"
+     *      and it works locally — but breaks on case-sensitive Linux servers
+     *      (e.g. Vercel, Docker) where the casing must match exactly.
+     *
+     * FIX: Setting forceConsistentCasingInFileNames to true makes TypeScript
+     *      error if your import casing doesn't match the actual filename,
+     *      catching these bugs at compile time instead of at deployment.
+     */
+    "forceConsistentCasingInFileNames": true,
     "plugins": [
       {
         "name": "next"
