@@ -1,53 +1,22 @@
 /**
- * Skills Modal Component - With Sticky Header & Natural German
- *
- * Full-page modal displaying comprehensive technical skills.
- * Features:
- * - Sticky header with back navigation and title
- * - Vertical layout: Icons positioned above category titles
- * - Beautiful gradient-themed skill cards
- * - Animated progress bars with gradient fills
- * - Responsive 3-column grid layout
- * - Smooth hover effects and transitions
- * - Bilingual support (English/German) with natural translations
- *
- * @component
+ * components/modals/skills-modal.tsx
+ * MOBILE FIX: Uses <ModalHeader>. All content unchanged.
  */
 
 "use client";
 
 import { useEffect } from "react";
-import {
-  ArrowLeft,
-  Code,
-  Palette,
-  Database,
-  Server,
-  Wrench,
-  Layers,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Code, Palette, Database, Server, Wrench, Layers } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { Language } from "@/lib/data";
-
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
+import ModalHeader from "@/components/ui/modal-header";
 
 interface SkillsModalProps {
   language: Language;
   onClose: () => void;
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
 export default function SkillsModal({ language, onClose }: SkillsModalProps) {
-  // ============================================================================
-  // KEYBOARD HANDLERS & SIDE EFFECTS
-  // ============================================================================
-
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -56,27 +25,14 @@ export default function SkillsModal({ language, onClose }: SkillsModalProps) {
     return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  // ============================================================================
-  // CONTENT DATA (BILINGUAL) - CORRECTED NATURAL GERMAN
-  // ============================================================================
-
   const content = {
-    // Header content
-    backButton: {
-      en: "Back to Portfolio",
-      de: "Zurück zum Portfolio",
-    },
-    headerTitle: {
-      en: "Technical Skills",
-      de: "Technische Fähigkeiten",
-    },
-    // Main title and subtitle
+    backButton: { en: "Back to Portfolio", de: "Zurück zum Portfolio" },
+    headerTitle: { en: "Technical Skills", de: "Technische Fähigkeiten" },
     title: { en: "Technical Skills", de: "Technische Fähigkeiten" },
     subtitle: {
       en: "Programming languages, frameworks, and design tools",
       de: "Programmiersprachen, Frameworks und Design-Tools",
     },
-    // Skill categories with natural German translations
     categories: [
       {
         icon: Code,
@@ -175,100 +131,55 @@ export default function SkillsModal({ language, onClose }: SkillsModalProps) {
     ],
   };
 
-  // Helper function to get skill name based on language
   const getSkillName = (skill: {
     name: string | { en: string; de: string };
-  }) => {
-    return typeof skill.name === "string" ? skill.name : skill.name[language];
-  };
-
-  // ============================================================================
-  // RENDER: SKILLS MODAL
-  // ============================================================================
+  }) => (typeof skill.name === "string" ? skill.name : skill.name[language]);
 
   return (
     <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* ====================================================================== */}
-      {/* STICKY HEADER WITH BACK NAVIGATION AND TITLE */}
-      {/* ====================================================================== */}
-      <header className="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Back Button */}
-            <Button
-              onClick={onClose}
-              variant="ghost"
-              size="sm"
-              className="gap-2 hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {content.backButton[language]}
-            </Button>
+      <ModalHeader
+        title={content.headerTitle[language]}
+        gradientClass="from-blue-600 via-purple-600 to-pink-600"
+        backLabel={content.backButton[language]}
+        onBack={onClose}
+      />
 
-            {/* Header Title */}
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              {content.headerTitle[language]}
-            </h1>
-
-            {/* Spacer for balance */}
-            <div className="w-32"></div>
-          </div>
-        </div>
-      </header>
-
-      {/* ====================================================================== */}
-      {/* MAIN CONTENT AREA */}
-      {/* ====================================================================== */}
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* ==================================================================== */}
-        {/* TITLE SECTION */}
-        {/* ==================================================================== */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl mb-6 shadow-lg">
             <Code className="w-10 h-10 text-purple-600 dark:text-purple-400" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             {content.title[language]}
           </h2>
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             {content.subtitle[language]}
           </p>
         </div>
 
-        {/* ==================================================================== */}
-        {/* SKILLS GRID - VERTICAL ICON LAYOUT */}
-        {/* ==================================================================== */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* On mobile: single column. md: 2 cols. lg: 3 cols. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {content.categories.map((category, idx) => {
             const Icon = category.icon;
             return (
               <Card
                 key={idx}
-                className={`group p-6 hover:shadow-2xl transition-all duration-300 bg-gradient-to-br ${category.bgLight} dark:${category.bgDark} border-2 border-slate-200 dark:border-slate-700 hover:-translate-y-1`}
+                className={`group p-5 sm:p-6 hover:shadow-2xl transition-all duration-300 bg-gradient-to-br ${category.bgLight} dark:${category.bgDark} border-2 border-slate-200 dark:border-slate-700 hover:-translate-y-1`}
               >
-                {/* ============================================================ */}
-                {/* CATEGORY HEADER - VERTICAL LAYOUT (Icon Above Title) */}
-                {/* ============================================================ */}
                 <div className="flex flex-col items-center text-center gap-3 mb-6 pb-4 border-b-2 border-slate-200/50 dark:border-slate-700/50">
-                  {/* Icon Container */}
                   <div
                     className={`p-3 bg-gradient-to-br ${category.gradient} rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}
                   >
                     <Icon className="w-7 h-7 text-white" />
                   </div>
-                  {/* Title Below Icon */}
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight px-2">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight px-2">
                     {category.title[language]}
                   </h3>
                 </div>
 
-                {/* ============================================================ */}
-                {/* SKILLS LIST WITH PROGRESS BARS */}
-                {/* ============================================================ */}
                 <div className="space-y-5">
                   {category.skills.map((skill, skillIdx) => (
                     <div key={skillIdx} className="space-y-2">
-                      {/* Skill name and percentage */}
                       <div className="flex justify-between items-center">
                         <span className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
                           {getSkillName(skill)}
@@ -279,12 +190,14 @@ export default function SkillsModal({ language, onClose }: SkillsModalProps) {
                           {skill.level}%
                         </span>
                       </div>
-
-                      {/* Progress bar with gradient fill */}
                       <div className="relative h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div
-                          className={`h-full bg-gradient-to-r ${category.gradient} rounded-full transition-all duration-1000 ease-out shadow-sm`}
-                          style={{ width: `${skill.level}%` }}
+                          className={`skill-progress-fill bg-gradient-to-r ${category.gradient}`}
+                          style={
+                            {
+                              "--skill-width": `${skill.level}%`,
+                            } as React.CSSProperties
+                          }
                         />
                       </div>
                     </div>
