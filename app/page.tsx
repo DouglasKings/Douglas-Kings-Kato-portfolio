@@ -33,7 +33,7 @@ import SkillsModal from "@/components/modals/skills-modal";
 import CertificatesModal from "@/components/modals/certificates-modal";
 import VideosModal from "@/components/modals/videos-modal";
 import GalleryModal from "@/components/modals/gallery-modal";
-import ReferencesModal from "@/components/modals/references-modal";
+import ReferencesModal from "@/components/modals/research-modal";
 import ContactModal from "@/components/modals/contact-modal";
 import SkillsSection from "@/components/sections/skills-section";
 import type { Language } from "@/lib/data";

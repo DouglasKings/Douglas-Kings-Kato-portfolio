@@ -1,14 +1,38 @@
 /**
- * Right Navigation Component - With PDF Resume Viewer
+ * components/navigation/right-navigation.tsx
  *
- * Displays the right sidebar navigation with:
- * - Portfolio & Media sections
- * - Quick links (View Resume, LinkedIn, GitHub)
- * - Resume viewer modal with fullscreen PDF display
- * - Contact information card
- * - Bilingual support
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
  *
- * @component
+ * FIX 1 — Resume 404 (same root cause as contact-modal.tsx):
+ *   This file has its OWN separate resume viewer (the right sidebar's
+ *   "View Resume" button opens its own modal, independent of the one in
+ *   contact-modal.tsx). It had the same wrong filename bug:
+ *     Was:  CV_Douglas_Kings_Kato_Java_Dev.pdf  (doesn't exist)
+ *     Now:  Douglas_Kings_Kato_Resume.pdf        (confirmed real filename)
+ *   Fixed in both the <iframe src> and the error-state <code> block.
+ *
+ * FIX 2 — "References" renamed to "Global Technical Research":
+ *   This nav card's id was "references", labeled "References" /
+ *   "Referenzen", with description "Professional recommendations from
+ *   past employers." Clicking it opens ResearchModal (research-modal.tsx),
+ *   which actually shows India/Malaysia field-research case studies — not
+ *   referee contacts. You confirmed you want this card to say "Global
+ *   Technical Research" instead, which now correctly matches the modal's
+ *   real content (ResearchModal's own header is already titled "Global
+ *   Technical Research" / "Globale technische Forschung").
+ *
+ *   I kept the internal id as "references" rather than renaming it to
+ *   "research", because page.tsx's activeModal switch statement matches
+ *   on this exact string ({activeModal === "references" && <ResearchModal
+ *   .../>}). Changing the id would require a matching edit in page.tsx;
+ *   changing only the label/description is the smaller, lower-risk fix
+ *   that achieves what you asked for (the card now reads "Global Technical
+ *   Research" wherever the user sees it) without touching routing logic
+ *   you didn't ask me to touch. If you'd prefer the id itself renamed for
+ *   code clarity, say so and I'll update page.tsx in the same pass.
+ *
+ * Everything else in this file — other nav cards, contact info card,
+ * layout — unchanged.
  */
 
 "use client";
@@ -23,6 +47,7 @@ import {
   Eye,
   X,
   ExternalLink,
+  Globe2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,13 +90,20 @@ export default function RightNavigation({
       color: "pink",
     },
     {
+      // ── FIX: id kept as "references" (matches page.tsx routing — see
+      // file header note) but icon/label/description now correctly
+      // describe what this card actually opens: the India/Malaysia
+      // field-research case studies in ResearchModal.
       id: "references",
-      icon: FileText,
-      label: { en: "References", de: "Referenzen" },
-      sublabel: { en: "Content", de: "Inhalt" },
+      icon: Globe2,
+      label: {
+        en: "Global Technical Research",
+        de: "Globale technische Forschung",
+      },
+      sublabel: { en: "Field Studies", de: "Feldstudien" },
       description: {
-        en: "Professional recommendations from past employers.",
-        de: "Professionelle Empfehlungen von früheren Arbeitgebern.",
+        en: "International field studies informing the technical roadmap for Kings Technologies.",
+        de: "Internationale Feldstudien, die die technische Roadmap von Kings Technologies prägen.",
       },
       color: "gray",
     },
@@ -192,7 +224,7 @@ export default function RightNavigation({
               onClick={() =>
                 window.open(
                   "https://www.linkedin.com/in/douglas-kings/",
-                  "_blank"
+                  "_blank",
                 )
               }
             >
@@ -293,11 +325,15 @@ export default function RightNavigation({
           {/* PDF VIEWER CONTAINER */}
           {/* ================================================================== */}
           <div className="flex-1 w-full h-full relative bg-slate-100 dark:bg-slate-900">
-            {/* PDF Iframe - Displays the actual PDF file */}
-            {/* IMPORTANT: Replace with your actual PDF path */}
-            {/* Path should be: /assets/documents/CV_Douglas_Kings_Kato_Java_Dev.pdf */}
+            {/*
+              ── FIX: corrected filename ──
+              Was: CV_Douglas_Kings_Kato_Java_Dev.pdf (404 — confirmed by
+                   your screenshot, doesn't exist in your documents folder)
+              Now: Douglas_Kings_Kato_Resume.pdf (matches the real file
+                   visible in your F:\...\public\assets\documents folder)
+            */}
             <iframe
-              src="/assets/documents/CV_Douglas_Kings_Kato_Java_Dev.pdf"
+              src="/assets/documents/Douglas_Kings_Kato_Resume.pdf"
               className="w-full h-full"
               title="Resume"
               onLoad={() => setPdfError(false)}
@@ -323,8 +359,9 @@ export default function RightNavigation({
                       ? "Please add your PDF resume to:"
                       : "Bitte fügen Sie Ihren PDF-Lebenslauf hinzu unter:"}
                   </p>
+                  {/* ── FIX: error text now matches the real expected filename ── */}
                   <code className="block bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 rounded text-sm font-mono break-all">
-                    /public/assets/documents/CV_Douglas_Kings_Kato_Java_Dev.pdf
+                    /public/assets/documents/Douglas_Kings_Kato_Resume.pdf
                   </code>
                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-4">
                     {language === "en"

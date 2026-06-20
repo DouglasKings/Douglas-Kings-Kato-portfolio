@@ -1,6 +1,24 @@
 /**
  * components/modals/contact-modal.tsx
- * MOBILE FIX: Uses <ModalHeader> for safe mobile layout. All content unchanged.
+ *
+ * ── CHANGE IN THIS VERSION ───────────────────────────────────────────────
+ *
+ * FIX — Resume 404 (root cause confirmed via screenshot):
+ *   Your actual file on disk is named:
+ *     Douglas_Kings_Kato_Resume.pdf
+ *   The code was pointing the <iframe> at:
+ *     CV_Douglas_Kings_Kato_Java_Dev.pdf
+ *   That file does not exist, so Next.js's iframe loaded its own 404 page
+ *   — which is exactly the black "404 / This page could not be found"
+ *   screen you saw. This was a wrong-path bug, not a PDF-rendering bug.
+ *
+ *   Updated BOTH places the path appears in this file:
+ *     1. The <iframe src="..."> that actually loads the PDF
+ *     2. The fallback <code> block shown only if the PDF fails to load
+ *        (so the error message itself doesn't lie about the expected path)
+ *
+ * Everything else — scroll-lock, contact cards, quick links — unchanged
+ * from your version.
  */
 
 "use client";
@@ -214,8 +232,13 @@ export default function ContactModal({ language, onClose }: ContactModalProps) {
             </Button>
           </div>
           <div className="flex-1 w-full h-full relative bg-slate-100 dark:bg-slate-900">
+            {/*
+              ── FIX: corrected filename ──
+              Was: CV_Douglas_Kings_Kato_Java_Dev.pdf (does not exist on disk)
+              Now: Douglas_Kings_Kato_Resume.pdf (confirmed actual filename)
+            */}
             <iframe
-              src="/assets/documents/CV_Douglas_Kings_Kato_Java_Dev.pdf"
+              src="/assets/documents/Douglas_Kings_Kato_Resume.pdf"
               className="w-full h-full"
               title="Resume"
               onLoad={() => setPdfError(false)}
@@ -230,8 +253,15 @@ export default function ContactModal({ language, onClose }: ContactModalProps) {
                       ? "Resume Not Found"
                       : "Lebenslauf nicht gefunden"}
                   </h3>
+                  {/*
+                    ── FIX: error message now shows the CORRECT expected
+                    path, matching the iframe src above. Previously this
+                    told you to look for a file under a name that was never
+                    going to exist, which would have sent you chasing the
+                    wrong filename if this fallback ever fired.
+                  */}
                   <code className="block bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 rounded text-sm font-mono break-all">
-                    /public/assets/documents/CV_Douglas_Kings_Kato_Java_Dev.pdf
+                    /public/assets/documents/Douglas_Kings_Kato_Resume.pdf
                   </code>
                 </div>
               </div>

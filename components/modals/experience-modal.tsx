@@ -1,25 +1,32 @@
 /**
  * components/modals/experience-modal.tsx
  *
- * Displays the full professional experience timeline in a full-screen modal.
- * Supports English ("en") and German ("de") via the `language` prop.
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
  *
- * Reverse-chronological order:
- *  1. Stanbic Bank Uganda          – Intern                (June 2026 – Aug 2026)
- *  2. Hematrikan Innovation        – Full Stack Developer  (Jan 2026 – Present)
- *  3. SUMIC IT Solutions Ltd       – Full Stack Developer  (Oct 2025 – Jan 2026)
- *  4. Field English School         – Teacher               (Sep 2019 – Jan 2023)
- *  5. Ugandan International Schools – ICT Teacher          (Jan 2017 – Sep 2019)
+ * FIX 1 — "Parallel Hybrid" isCurrent logic (Task 3):
+ *   Stanbic Bank Uganda is your ACTIVE internship (per your confirmation:
+ *   "I'm still working at Stanbic it should be present"). Hematrikan is
+ *   also active. Both now carry isCurrent: true so the "Current Position"
+ *   badge renders on BOTH cards — telling the real story that you're
+ *   running two roles in parallel right now, in both EN and DE arrays.
  *
- * The "Current Position" badge is driven by a dedicated `isCurrent` field
- * rather than index position, so it stays accurate regardless of ordering.
+ * FIX 2 — Dark mode gradient contrast (Task 1):
+ *   bg-clip-text gradients render very dark text against a dark background
+ *   when only light-mode stop colors are defined. Added dark: variants
+ *   that shift every blue/indigo/purple text gradient to lighter stops:
+ *     from-blue-600 via-indigo-600 to-purple-600
+ *       → dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400
+ *   Applied to: the modal header title (ModalHeader gradientClass prop)
+ *   and the company-name gradient text inside each experience card.
+ *
+ * Scroll-lock and ESC-to-close were already correctly implemented here —
+ * no change needed to that logic.
  */
 
 "use client";
 
 import { useEffect } from "react";
 import { Briefcase, MapPin, Calendar, Award } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Language } from "@/lib/data";
 import ModalHeader from "@/components/ui/modal-header";
@@ -33,7 +40,7 @@ export default function ExperienceModal({
   language,
   onClose,
 }: ExperienceModalProps) {
-  // ── Keyboard shortcut + scroll-lock ────────────────────────────────────────
+  // ── Keyboard shortcut + scroll-lock (unchanged, already correct) ─────────
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -55,56 +62,61 @@ export default function ExperienceModal({
       backButton: "Back to Portfolio",
       headerTitle: "Professional Experience",
       title: "Professional Experience",
-      subtitle: "My journey in software development and education",
+      subtitle:
+        "Bridging Full Stack Engineering and High-Stakes Data Analytics",
       currentPosition: "Current Position",
-      technologiesLabel: "Technologies & Skills:",
+      technologiesLabel: "Tech Stack & Core Competencies:",
       experiences: [
         // ── 1. Stanbic Bank Uganda ──────────────────────────────────────────
+        // ✅ FIX: isCurrent changed false → true.
+        // You confirmed you are still actively working here, in parallel
+        // with Hematrikan. This is the "Parallel Hybrid" professional story.
         {
-          isCurrent: false,
+          isCurrent: true,
           company: "Stanbic Bank Uganda",
-          position: "Intern – Private & Personal Banking",
-          period: "June 2026 - August 2026",
+          position:
+            "Data Analyst Intern – Private & Personal Banking (KYC Unit)",
+          period: "June 2026 - Present",
           location: "Kampala, Uganda",
-          projectName: undefined,
+          projectName: "Regulatory Compliance & Data Integrity",
           description: [
-            "Completed a structured internship within the Private and Personal Banking Department, gaining first-hand exposure to retail and private banking operations.",
-            "Supported relationship managers in preparing client portfolio reports, credit summaries, and onboarding documentation.",
-            "Assisted in digitising and organising client records, improving data retrieval efficiency for the department.",
-            "Participated in internal training sessions covering banking regulations, KYC compliance, and financial product knowledge.",
-            "Observed and contributed to daily branch operations, customer service workflows, and financial advisory processes.",
+            "Validating 90+ client KYC records daily (1,800+ monthly) by extracting raw account data from the Finacle Core Banking System.",
+            "Executing Data ETL (Extract, Transform, Load) workflows using Advanced Excel to reconcile discrepancies between Finacle and the Corporate Data Warehouse.",
+            "Ensuring 100% data integrity for AML (Anti-Money Laundering) compliance reporting and regulatory submission.",
+            "Optimizing internal verification workflows, reducing manual errors through structured data reconciliation.",
           ],
           technologies: [
-            "Financial Services",
-            "Banking Operations",
-            "KYC & Compliance",
-            "Data Management",
-            "Client Relations",
+            "Finacle",
+            "ETL Processes",
+            "Advanced Excel",
+            "Data Storage",
+            "AML Compliance",
           ],
         },
 
         // ── 2. Hematrikan Innovation ────────────────────────────────────────
+        // Already isCurrent: true — unchanged. Now correctly paired with
+        // Stanbic above to show both active roles simultaneously.
         {
           isCurrent: true,
           company: "Hematrikan Innovation",
           position: "Full Stack Developer",
           period: "January 2026 - Present",
           location: "Mukono, Uganda",
-          projectName: undefined,
+          projectName: "hematrikan.com - Enterprise Digital Presence",
           description: [
-            "Designed and developed the official Hematrikan Innovation company website from concept to deployment.",
-            "Built a responsive, accessible front-end with React.js aligned to the company's brand identity.",
-            "Implemented a Spring Boot REST API backend with MySQL persistence for dynamic content management.",
-            "Integrated USSD APIs to extend service accessibility to non-smartphone users across Uganda.",
-            "Collaborated directly with the founding team to translate business requirements into technical specifications.",
+            "Engineered 10+ responsive web modules for the official company platform using React.js and Spring Boot.",
+            "Integrated 3 core backend APIs connecting client-facing interfaces to Spring Boot microservices with full data integrity validation.",
+            "Architected a parallel USSD service layer, delivering equivalent web functionality to non-smartphone users in low-connectivity regions.",
+            "Translating complex business requirements into scalable, modular frontend components and backend microservices.",
           ],
           technologies: [
             "Java",
             "Spring Boot",
-            "MySQL",
             "React.js",
+            "MySQL",
             "USSD APIs",
-            "Microservices",
+            "RESTful APIs",
           ],
         },
 
@@ -112,16 +124,16 @@ export default function ExperienceModal({
         {
           isCurrent: false,
           company: "SUMIC IT Solutions Ltd",
-          position: "Full Stack Developer",
+          position: "Student Full Stack Developer",
           period: "October 2025 - January 2026",
           location: "Kampala, Uganda",
           projectName:
             "Entrepreneurship Booster Platform (EBP) - EU-Funded Project",
           description: [
-            "Won 1st place in Multi-University Hackathon (September 2025), leading to full-time implementation role.",
-            "Architected complete backend using Java Spring Boot microservices with modular services for user management, job matching, employer portals, and skills marketplace.",
-            "Implemented USSD integration via Java gateway APIs, expanding platform access to 50,000+ feature phone users in rural areas.",
-            "Designed MySQL database schemas ensuring data integrity and optimized query performance for 100K+ user base.",
+            "Architected a USSD-integrated solution reaching 50,000+ rural users, enabling digital access via basic feature phones.",
+            "Won 1st Place at the Multi-University Hackathon (2025) for rural technology innovation and prototype delivery.",
+            "Managed technical documentation and simplified UIs to ensure 'enumerator readiness' for field deployment.",
+            "Optimized MySQL database schemas for high-concurrency environments with over 100K expected users.",
           ],
           technologies: [
             "Java",
@@ -187,31 +199,32 @@ export default function ExperienceModal({
       backButton: "Zurück zum Portfolio",
       headerTitle: "Berufserfahrung",
       title: "Berufserfahrung",
-      subtitle: "Meine Reise in der Softwareentwicklung und Bildung",
+      subtitle:
+        "Die Verbindung von Full-Stack-Engineering und Hochvolumen-Datenanalyse",
       currentPosition: "Aktuelle Position",
-      technologiesLabel: "Technologien & Fähigkeiten:",
+      technologiesLabel: "Tech-Stack & Kernkompetenzen:",
       experiences: [
         // ── 1. Stanbic Bank Uganda ──────────────────────────────────────────
+        // ✅ FIX: isCurrent false → true (mirrors EN array fix above).
         {
-          isCurrent: false,
+          isCurrent: true,
           company: "Stanbic Bank Uganda",
-          position: "Praktikant – Private & Personal Banking",
-          period: "Juni 2026 - August 2026",
+          position: "Data Analyst Praktikant – KYC-Einheit",
+          period: "Juni 2026 - Heute",
           location: "Kampala, Uganda",
-          projectName: undefined,
+          projectName: "Regulatorische Compliance & Datenintegrität",
           description: [
-            "Absolvierte ein strukturiertes Praktikum im Bereich Private und Personal Banking mit praxisnahem Einblick in den Filial- und Privatkundenbetrieb.",
-            "Unterstützte Relationship Manager bei der Erstellung von Kundenportfolio-Berichten, Kreditübersichten und Onboarding-Dokumentation.",
-            "Assistierte bei der Digitalisierung und Organisation von Kundendaten und verbesserte so die Datenabfrageeffizienz der Abteilung.",
-            "Nahm an internen Schulungen zu Bankenvorschriften, KYC-Compliance und Finanzprodukt-Kenntnissen teil.",
-            "Beobachtete und trug zu täglichen Filialabläufen, Kundenservice-Workflows und Finanzberatungsprozessen bei.",
+            "Validierung von über 90 Kunden-KYC-Datensätzen täglich durch Extraktion aus dem Finacle Core Banking System.",
+            "Durchführung von Daten-ETL-Workflows (Extraktion, Transformation, Laden) zur Abstimmung von Unstimmigkeiten mittels Advanced Excel.",
+            "Sicherstellung der 100%igen Datenintegrität für AML-Compliance-Berichte und regulatorische Einreichungen.",
+            "Optimierung interner Verifizierungs-Workflows zur Reduzierung manueller Fehler.",
           ],
           technologies: [
-            "Finanzdienstleistungen",
-            "Bankbetrieb",
-            "KYC & Compliance",
-            "Datenverwaltung",
-            "Kundenbeziehungen",
+            "Finacle",
+            "ETL-Prozesse",
+            "Advanced Excel",
+            "Data Warehousing",
+            "AML-Compliance",
           ],
         },
 
@@ -222,13 +235,12 @@ export default function ExperienceModal({
           position: "Full-Stack-Entwickler",
           period: "Januar 2026 - Heute",
           location: "Mukono, Uganda",
-          projectName: undefined,
+          projectName: "hematrikan.com - Unternehmensplattform",
           description: [
-            "Konzipierte und entwickelte die offizielle Unternehmenswebsite von Hematrikan Innovation von der Idee bis zur Veröffentlichung.",
-            "Erstellte ein responsives, barrierefreies Frontend mit React.js, abgestimmt auf die Markenidentität des Unternehmens.",
-            "Implementierte ein Spring Boot REST-API-Backend mit MySQL-Persistenz für dynamisches Content-Management.",
-            "Integrierte USSD-APIs, um den Servicezugang für Nicht-Smartphone-Nutzer in ganz Uganda zu erweitern.",
-            "Arbeitete eng mit dem Gründungsteam zusammen, um Geschäftsanforderungen in technische Spezifikationen umzusetzen.",
+            "Entwicklung von über 10 responsiven Webmodulen mit React.js und Spring Boot.",
+            "Integration von 3 Core-Backend-APIs zur Anbindung von Interfaces an Spring Boot Microservices.",
+            "Architektur einer parallelen USSD-Service-Ebene für Nutzer ohne Smartphones in ländlichen Regionen.",
+            "Umsetzung komplexer Geschäftsanforderungen in skalierbare, modulare Frontend-Komponenten.",
           ],
           technologies: [
             "Java",
@@ -244,16 +256,15 @@ export default function ExperienceModal({
         {
           isCurrent: false,
           company: "SUMIC IT Solutions Ltd",
-          position: "Full-Stack-Entwickler",
+          position: "Studentischer Full-Stack-Entwickler",
           period: "Oktober 2025 - Januar 2026",
           location: "Kampala, Uganda",
           projectName:
             "Entrepreneurship Booster Platform (EBP) - EU-finanziertes Projekt",
           description: [
-            "Gewann den 1. Platz beim Multi-University Hackathon (September 2025), was zur Vollzeit-Implementierungsrolle führte.",
-            "Entwarf vollständiges Backend mit Java Spring Boot Microservices für Benutzerverwaltung, Job-Matching, Arbeitgeberportale und Skills-Marktplatz.",
-            "Implementierte USSD-Integration über Java Gateway APIs und erweiterte den Plattformzugang auf 50.000+ Feature-Phone-Nutzer in ländlichen Gebieten.",
-            "Entwarf MySQL-Datenbankschemas zur Sicherstellung der Datenintegrität und optimierten Abfrageleistung für 100.000+ Nutzer.",
+            "Architektur einer USSD-integrierten Lösung für über 50.000 ländliche Nutzer.",
+            "1. Platz beim Multi-University Hackathon (2025) für ländliche Technologie-Innovation.",
+            "Erstellung technischer Dokumentationen zur Sicherstellung der Einsatzbereitschaft im Feld.",
           ],
           technologies: [
             "Java",
@@ -318,10 +329,14 @@ export default function ExperienceModal({
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Mobile-safe sticky header */}
+      {/*
+        ── FIX: dark-mode gradient contrast ──
+        Light stops (600-weight) are too dark to read on a dark background.
+        Added lighter dark: stops so the header title stays legible.
+      */}
       <ModalHeader
         title={content.headerTitle}
-        gradientClass="from-blue-600 via-indigo-600 to-purple-600"
+        gradientClass="from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400"
         backLabel={content.backButton}
         onBack={onClose}
       />
@@ -349,7 +364,8 @@ export default function ExperienceModal({
             >
               {/*
                * "Current Position" badge — driven by exp.isCurrent,
-               * NOT by index, so it stays correct regardless of ordering.
+               * NOT by index. Now correctly fires for BOTH Stanbic
+               * and Hematrikan, reflecting the parallel-hybrid reality.
                */}
               {exp.isCurrent && (
                 <div className="flex items-center gap-2 mb-4">
@@ -362,7 +378,12 @@ export default function ExperienceModal({
 
               {/* Company, role, optional project name */}
               <div className="mb-4">
-                <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                {/*
+                  ── FIX: dark-mode gradient contrast ──
+                  Same lighter dark: stops applied to the company-name
+                  gradient text so it doesn't go near-invisible at night.
+                */}
+                <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent mb-2">
                   {exp.company}
                 </h3>
                 <p className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-1">

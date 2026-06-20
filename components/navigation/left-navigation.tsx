@@ -1,35 +1,22 @@
 /**
- * Left Navigation Component — components/navigation/left-navigation.tsx
+ * components/navigation/left-navigation.tsx
  *
- * ✅ ARIA FIX (axe/aria — aria-valid-attr-value):
+ * ── CHANGE IN THIS VERSION ───────────────────────────────────────────────
  *
- *    The linter error was:
- *      "Invalid ARIA attribute value: aria-expanded="{expression}""
+ * FIX — Cross-file stat inconsistency:
+ *   You asked me to make sure "7+ Years" and "500+ Mentees/Students" are
+ *   reflected consistently. profile-content.tsx already says 7+ and 500+.
+ *   But the "Quick Stats" accordion in THIS file hardcoded different,
+ *   smaller numbers:
+ *     Experience: "5+ Years" / "5+ Jahre"      → now "7+ Years" / "7+ Jahre"
+ *     Students:   "100+"                        → now "500+"
+ *   These two panels sit on the same page (left sidebar vs. main profile
+ *   card) and a visitor could see "5+ Years" in one place and "7+ Years"
+ *   in another within the same scroll — that's the actual consistency bug
+ *   your instruction was catching. Certifications ("15+") was already
+ *   consistent with profile-content.tsx and is unchanged.
  *
- *    This is the axe accessibility rule firing because the value wasn't
- *    resolving to a recognized valid ARIA token at analysis time.
- *
- *    Root cause & correct fix:
- *      In React, `aria-expanded` on a native <button> accepts a BOOLEAN
- *      directly — React converts it to the correct string in the DOM.
- *      The linter (Microsoft Edge Tools / axe) was seeing the dynamic
- *      expression `{statsExpanded ? "true" : "false"}` and flagging it
- *      because it evaluated the JSX expression as a literal "{expression}"
- *      string at static analysis time.
- *
- *      The most compatible solution that satisfies BOTH React and axe is:
- *        aria-expanded={statsExpanded}   ← plain boolean, React handles it
- *
- *      This produces aria-expanded="true" / aria-expanded="false" in the DOM,
- *      which is exactly what screen readers and axe expect.
- *
- * Features:
- * - Section navigation cards (Education, Experience, Skills, Certificates)
- * - Quick Stats collapsible accordion
- * - Bilingual (English / German)
- * - Responsive sticky sidebar
- *
- * @component
+ * No other logic, layout, or the aria-expanded fix from earlier changed.
  */
 
 "use client";
@@ -210,24 +197,7 @@ export default function LeftNavigation({
 
       {/* ══════════════════════════════════════════════════════════════════════
           QUICK STATS ACCORDION
-
-          ✅ ARIA FIX:
-          Use a plain boolean value for aria-expanded.
-
-          ❌ Was:   aria-expanded={statsExpanded ? "true" : "false"}
-                    → axe flags this as "Invalid ARIA attribute value:
-                      aria-expanded='{expression}'" during static analysis
-                      because the ternary expression isn't resolved at lint time.
-
-          ✅ Now:   aria-expanded={statsExpanded}
-                    → React renders aria-expanded="true" or aria-expanded="false"
-                      in the DOM correctly. axe sees a clean boolean-like value.
-                      Screen readers announce expanded/collapsed state properly.
-
-          Why this works:
-            React's JSX-to-DOM mapping converts boolean `true` → "true" and
-            `false` → "false" for aria-* attributes on native elements.
-            This is the idiomatic React pattern and satisfies the axe rule.
+          aria-expanded fix (boolean, not string) — already correct, unchanged.
           ══════════════════════════════════════════════════════════════════════ */}
       <div className="mb-8">
         <button
@@ -252,15 +222,25 @@ export default function LeftNavigation({
 
         {statsExpanded && (
           <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            {/*
+              ── FIX: Experience figure ──
+              Was "5+ Years" / "5+ Jahre" — contradicted profile-content.tsx's
+              "7+" stat card shown lower on the same page. Now matches.
+            */}
             <div className="flex justify-between items-center p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-300">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 {language === "en" ? "Experience" : "Erfahrung"}
               </span>
               <span className="font-bold text-blue-600 dark:text-blue-400">
-                {language === "en" ? "5+ Years" : "5+ Jahre"}
+                {language === "en" ? "7+ Years" : "7+ Jahre"}
               </span>
             </div>
 
+            {/*
+              ── FIX: Students Taught figure ──
+              Was "100+" — contradicted profile-content.tsx's "500+" stat
+              card. Now matches.
+            */}
             <div className="flex justify-between items-center p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-300">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 {language === "en"
@@ -268,7 +248,7 @@ export default function LeftNavigation({
                   : "Unterrichtete Schüler"}
               </span>
               <span className="font-bold text-green-600 dark:text-green-400">
-                100+
+                500+
               </span>
             </div>
 

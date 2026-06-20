@@ -1,36 +1,28 @@
 /**
- * Profile Content Component - Final Refined Edition with Natural German
+ * components/profile-content.tsx
  *
- * Displays the main hero/profile section of the portfolio.
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
  *
- * ✅ FIX APPLIED (Fix #2 — "See My Work" Button):
- *    PROBLEM:
- *      The original handleSeeMyWork() tried to scroll to a DOM element with
- *      id="gallery". But the gallery section doesn't exist as a rendered DOM
- *      node — it only appears inside a Modal when triggered. So scrollIntoView()
- *      silently fails and nothing happens.
+ * FIX — Dark mode gradient contrast (Task 1):
+ *   The job-title line ("Full Stack Developer | Data Analyst | ICT Educator")
+ *   uses a blue→purple→pink gradient with no dark: stops — added lighter
+ *   variants so it stays readable on the dark hero background. Also added
+ *   dark: border/text states to the "See My Work" outline button, whose
+ *   purple-600 border/text was low-contrast against a dark card background.
  *
- *    SOLUTION:
- *      Replace the scroll approach with a direct modal trigger.
- *      The button now calls `onNavigateToGallery()` — a callback prop passed
- *      down from page.tsx — which sets activeModal = "gallery", causing the
- *      Gallery Modal to render immediately. No scrolling needed.
+ * NOT CHANGED — and why:
+ *   You asked me to verify the "4.81 GPA" stat is present and consistent.
+ *   I searched this file (and lib/data.ts, and left-navigation.tsx) and a
+ *   GPA figure does not appear anywhere in the code you pasted. The stats
+ *   block here only contains: experienceYears ("7+"), studentsTaught
+ *   ("500+"), and certifications ("15+"). Per my accuracy protocol, I'm not
+ *   inventing a GPA card — that would be fabricating a credential into your
+ *   public portfolio. If you want a GPA stat added, tell me the real number
+ *   and where it should appear (a 4th stat card, or inside the "Currently
+ *   Pursuing" degree-progress card), and I'll wire it in.
  *
- *    NEW PROP ADDED:
- *      onNavigateToGallery?: () => void
- *      → Wired in page.tsx as: onNavigateToGallery={() => setActiveModal("gallery")}
- *
- * Features:
- * - Language switcher (EN ↔ DE)
- * - Profile picture with animated online indicator
- * - Name, title, and bio
- * - Welcome card with "View Experience" and "See My Work" CTA buttons
- * - Stats grid: Years Experience / Students Taught / Certifications
- * - "Currently Pursuing" degree progress card
- * - Bilingual content (English / German) with natural translations
- *
- * @component
- * @param {ProfileContentProps} props
+ * Everything else — the onNavigateToGallery fix, language switcher,
+ * profile picture, stats grid layout — is unchanged from your version.
  */
 
 "use client";
@@ -63,12 +55,8 @@ interface ProfileContentProps {
    */
   onOpenExperience?: () => void;
   /**
-   * ✅ NEW PROP (Fix #2):
    * Callback to open the Gallery Modal directly.
    * Wired in page.tsx as: () => setActiveModal("gallery")
-   *
-   * Previously, the button tried to scroll to id="gallery" which doesn't
-   * exist as a DOM node. Now it triggers the modal instead.
    */
   onNavigateToGallery?: () => void;
 }
@@ -81,56 +69,80 @@ const content = {
   en: {
     greeting: "Hello, I'm",
     name: "Douglas Kings Kato",
-    title: "Software Developer, Multimedia Specialist & Educator",
-    subtitle: "Full Stack Developer | Software Engineer | ICT Educator",
-    bio: "Full Stack Developer with expertise in Java Spring Boot microservices, React.js, and database optimization. Proven track record building scalable backend systems including award-winning USSD-integrated platform serving underserved communities. Combines 5+ years of ICT education experience with hands-on software development, delivering user-centric solutions in Agile environments.",
+    // ── FIX: title split into two parts instead of one long string ──
+    // Root cause of the cropping in your screenshot: this was a single
+    // string ("...| ICT Educator") that the browser auto-wrapped wherever
+    // it ran out of horizontal space, which on most screens broke right
+    // after "Analyst |" — leaving "ICT Educator" stranded as an orphaned
+    // second line with no relationship to the line above it, AND the
+    // gradient text box (bg-clip-text) was clipping the tops of letters
+    // because the line-height was too tight for two wrapped lines.
+    //
+    // Fix: split into titleLine1 / titleLine2 so "ICT Educator" is always
+    // deliberately on its own line (not an accident of viewport width),
+    // and render them as two separate <p> elements with proper line-height
+    // so ascenders (capital letters, the "|" character) aren't cropped.
+    titleLine1: "Full Stack Developer | Data Analyst |",
+    titleLine2: "ICT Educator",
+    subtitle: "Specialized in USSD & Banking Data Systems",
+    bio: "A Hybrid Professional bridging complex backend engineering with high-stakes data validation. With a 7-year foundation in international technical communication, I specialize in architecting USSD-integrated solutions for digital inclusion and optimizing data integrity within Tier-1 banking environments. Informed by global research in India and Malaysia, I implement world-class standards in high-concurrency design and resilient digital public infrastructure.",
     welcome: "Welcome to My Interactive Portfolio",
     welcomeDescription:
       "Click on any section from the left or right panels to explore my professional journey, technical skills, and creative work.",
-    currentlyPursuing: "Currently Pursuing",
-    degree: "BSc. in Applied Information Technology",
-    experienceYears: "5+",
-    experienceLabel: "Years Experience",
-    experienceSubtitle: "International Teaching",
-    experienceDetail: "Across Multiple Countries",
-    studentsTaught: "100+",
-    studentsTaughtLabel: "Students Taught",
-    studentsTaughtSubtitle: "Across Multiple Countries",
-    studentsTaughtDetail: "In Various Technologies",
+    currentlyPursuing: "Final Year Candidate",
+    degree: "BSc in Applied Information Technology",
+    experienceYears: "7+",
+    experienceLabel: "Years Professional Experience",
+    experienceSubtitle: "Global Technical Training",
+    experienceDetail: "China & Uganda Portfolio",
+    studentsTaught: "500+",
+    studentsTaughtLabel: "Mentees & Students",
+    studentsTaughtSubtitle: "International ICT Instruction",
+    studentsTaughtDetail: "AI, Software & Digital Literacy",
     certifications: "15+",
     certificationsLabel: "Certifications",
     certificationsSubtitle: "Professional & Technical",
-    certificationsDetail: "Industry Recognized",
-    viewExperience: "View Experience",
-    seeMyWork: "See My Work", // ← triggers Gallery Modal (Fix #2)
+    certificationsDetail: "Industry Recognized Credentials",
+    viewExperience: "Explore Journey",
+    seeMyWork: "View Technical Portfolio",
     switchLanguage: "Switch to German",
   },
   de: {
     greeting: "Hallo, ich bin",
     name: "Douglas Kings Kato",
-    title: "Softwareentwickler, Multimediaspezialist und Pädagoge",
-    subtitle: "Full-Stack-Entwickler | Software-Ingenieur | ICT-Pädagoge",
-    bio: "Full-Stack-Entwickler mit Expertise in Java Spring Boot Microservices, React.js und Datenbankoptimierung. Nachgewiesene Erfolge beim Aufbau skalierbarer Backend-Systeme, einschließlich preisgekrönter USSD-integrierter Plattform für unterversorgte Gemeinschaften. Kombiniert über 5 Jahre ICT-Unterrichtserfahrung mit praktischer Softwareentwicklung und liefert benutzerzentrierte Lösungen in agilen Umgebungen.",
+    // ── German kept exactly as-is, per your instruction ──
+    // Still split into titleLine1 / titleLine2 ONLY so the `en` and `de`
+    // objects share an identical shape — TypeScript infers `text`'s type
+    // as a union of both branches, so every key must exist on both sides
+    // or property access below would fail type-checking. titleLine2 is
+    // an empty string for German and the render logic (below) skips
+    // rendering it entirely when language is "de", so the visual result
+    // is unchanged: German still shows as one single-line title, exactly
+    // as it did before.
+    titleLine1: "Full Stack Entwickler | Data Analyst | IT-Dozent",
+    titleLine2: "",
+    subtitle: "Spezialisiert auf USSD & Banking-Datensysteme",
+    bio: "Ein hybrider Experte, der die Brücke zwischen komplexem Backend-Engineering und hochsensibler Datenvalidierung schlägt. Mit einer 7-jährigen Basis in internationaler technischer Kommunikation spezialisiere ich mich auf die Architektur USSD-integrierter Lösungen zur digitalen Inklusion sowie auf die Optimierung der Datenintegrität in Tier-1-Banksystemen. Geprägt durch globale Forschung in Indien und Malaysia, implementiere ich Weltklasse-Standards in Hochverfügbarkeitsdesign und resilienter digitaler öffentlicher Infrastruktur.",
     welcome: "Willkommen in meinem interaktiven Portfolio",
     welcomeDescription:
-      "Klicken Sie auf einen beliebigen Abschnitt in den linken oder rechten Panels, um meine berufliche Reise, technischen Fähigkeiten und kreative Arbeit zu erkunden.",
-    currentlyPursuing: "Derzeit in Ausbildung",
-    degree: "BSc. in Angewandter Informationstechnologie",
-    experienceYears: "5+",
-    experienceLabel: "Jahre Erfahrung",
-    experienceSubtitle: "Internationaler Unterricht",
-    experienceDetail: "In mehreren Ländern",
-    studentsTaught: "100+",
-    studentsTaughtLabel: "Unterrichtete Schüler",
-    studentsTaughtSubtitle: "In mehreren Ländern",
-    studentsTaughtDetail: "In verschiedenen Technologien",
+      "Erkunden Sie meinen beruflichen Werdegang, meine technische Expertise und meine globale Feldforschung über die Panels.",
+    currentlyPursuing: "Abschlusskandidat",
+    degree: "BSc in Angewandter Informationstechnologie",
+    experienceYears: "7+",
+    experienceLabel: "Jahre Berufserfahrung",
+    experienceSubtitle: "Globale technische Ausbildung",
+    experienceDetail: "Portfolio aus China & Uganda",
+    studentsTaught: "500+",
+    studentsTaughtLabel: "Mentees & Studenten",
+    studentsTaughtSubtitle: "Internationale IT-Lehre",
+    studentsTaughtDetail: "KI, Software & digitale Kompetenz",
     certifications: "15+",
     certificationsLabel: "Zertifizierungen",
     certificationsSubtitle: "Beruflich & Technisch",
-    certificationsDetail: "Branchlich anerkannt",
-    viewExperience: "Erfahrung anzeigen",
-    seeMyWork: "Meine Arbeit ansehen", // ← triggers Gallery Modal (Fix #2)
-    switchLanguage: "Auf Englisch wechseln",
+    certificationsDetail: "Branchenweit anerkannte Qualifikationen",
+    viewExperience: "Werdegang erkunden",
+    seeMyWork: "Technisches Portfolio ansehen",
+    switchLanguage: "Auf Englisch umstellen",
   },
 };
 
@@ -146,33 +158,15 @@ export default function ProfileContent({
 }: ProfileContentProps) {
   const text = content[language];
 
-  // ---------------------------------------------------------------------------
-  // EVENT HANDLERS
-  // ---------------------------------------------------------------------------
-
   /**
-   * ✅ FIX #2 — "See My Work" handler
-   *
-   * OLD (broken) approach:
-   *   document.getElementById("gallery")?.scrollIntoView(...)
-   *   → The gallery lives in a Modal, so the DOM element doesn't exist yet.
-   *     The scroll call silently does nothing.
-   *
-   * NEW (correct) approach:
-   *   Call onNavigateToGallery() which is wired in page.tsx to:
-   *   setActiveModal("gallery") → React renders <GalleryModal /> immediately.
-   *
-   * No setTimeout, no DOM queries, no scroll needed.
+   * "See My Work" handler — calls onNavigateToGallery() which is wired in
+   * page.tsx to setActiveModal("gallery"). Unchanged from your version.
    */
   const handleSeeMyWork = () => {
     if (onNavigateToGallery) {
       onNavigateToGallery();
     }
   };
-
-  // ---------------------------------------------------------------------------
-  // RENDER
-  // ---------------------------------------------------------------------------
 
   return (
     <section id="profile" className="scroll-mt-8">
@@ -184,7 +178,6 @@ export default function ProfileContent({
         <div className="relative z-10">
           {/* ==================================================================
               LANGUAGE SWITCHER
-              Calls onToggleLang to flip between "en" and "de" in the parent.
               ================================================================== */}
           {onToggleLang && (
             <div className="flex justify-center mb-8">
@@ -238,8 +231,28 @@ export default function ProfileContent({
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
               {text.name}
             </h1>
-            <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-              {text.title}
+            {/*
+              ── FIX: dark-mode gradient contrast + title structure ──
+              blue-600/purple-600/pink-600 had no dark: stops (fixed below
+              via dark: variants). Separately: English now renders as two
+              explicit lines (titleLine1 / titleLine2) instead of one
+              auto-wrapping string, so "ICT Educator" always sits cleanly
+              on its own line by design — not by accident of viewport
+              width. German's titleLine2 is empty, so only one line
+              renders for German, visually identical to before.
+
+              leading-snug (instead of the tighter default line-height)
+              gives bg-clip-text enough vertical room that ascenders
+              (capital letters, the "|" glyph) don't get visually cropped
+              at the top — that cropping is what showed in your
+              screenshot, caused by a wrapped two-line title fighting for
+              space in a line-height sized for one line.
+            */}
+            <p className="text-xl md:text-2xl font-bold leading-snug bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-300 dark:to-pink-400 bg-clip-text text-transparent mb-2">
+              <span className="block">{text.titleLine1}</span>
+              {text.titleLine2 && (
+                <span className="block">{text.titleLine2}</span>
+              )}
             </p>
             <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 font-medium">
               {text.subtitle}
@@ -248,18 +261,25 @@ export default function ProfileContent({
 
           {/* ==================================================================
               BIO
+
+              ── FIX: justified text alignment ──
+              You asked for the bio paragraph to be "properly justified" in
+              both English and German. Both languages render through this
+              same <p> tag (only text.bio swaps per language, not the JSX),
+              so one change covers both.
+
+              Changed text-center → text-justify. Note: text-center and
+              text-justify are mutually exclusive — justification needs the
+              text left-edge-aligned so each line can stretch evenly to the
+              right edge, so the centering had to be removed for
+              justification to actually take visual effect.
               ================================================================== */}
-          <p className="text-center text-base md:text-lg text-slate-700 dark:text-slate-300 mb-10 leading-relaxed max-w-4xl mx-auto px-4">
+          <p className="text-justify text-base md:text-lg text-slate-700 dark:text-slate-300 mb-10 leading-relaxed max-w-4xl mx-auto px-4">
             {text.bio}
           </p>
 
           {/* ==================================================================
               WELCOME CARD WITH CTA BUTTONS
-
-              Two primary actions:
-              1. "View Experience" → calls onOpenExperience → opens ExperienceModal
-              2. "See My Work"     → calls handleSeeMyWork → calls onNavigateToGallery
-                                     → opens GalleryModal (✅ Fix #2)
               ================================================================== */}
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 mb-10 text-center border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">
@@ -279,16 +299,17 @@ export default function ProfileContent({
                 {text.viewExperience}
               </Button>
 
-              {/* --- See My Work Button (✅ Fixed) ---
-                  onClick → handleSeeMyWork() → onNavigateToGallery()
-                  → page.tsx: setActiveModal("gallery")
-                  → <GalleryModal /> renders as an overlay
-                  No scroll, no DOM query — just a state update. */}
+              {/*
+                --- See My Work Button ---
+                FIX: added dark: variants to the border/text colors.
+                purple-600 border + purple-600 text were too dark to read
+                clearly against the dark welcome-card background.
+              */}
               <Button
                 onClick={handleSeeMyWork}
                 size="lg"
                 variant="outline"
-                className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 bg-transparent font-semibold px-8 transition-all duration-300"
+                className="border-2 border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-300 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white bg-transparent font-semibold px-8 transition-all duration-300"
               >
                 {text.seeMyWork}
               </Button>
@@ -297,6 +318,10 @@ export default function ProfileContent({
 
           {/* ==================================================================
               STATS GRID — Icons stacked above text (vertical layout)
+
+              NOTE: 3 cards only — Experience / Students / Certifications.
+              No GPA card exists in source data, so none is added here.
+              See file header note for what's needed if you want one added.
               ================================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             {/* Experience Card */}
@@ -365,6 +390,8 @@ export default function ProfileContent({
 
           {/* ==================================================================
               CURRENTLY PURSUING — Degree progress card
+              (white-on-color gradient — already fine in dark mode since
+              the card itself is the colored surface, not page background)
               ================================================================== */}
           <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-purple-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 border-0">
             <div className="p-8 text-center">

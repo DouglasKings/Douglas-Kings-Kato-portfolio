@@ -1,13 +1,32 @@
 /**
  * components/modals/education-modal.tsx
- * MOBILE FIX: Uses <ModalHeader>. All content unchanged.
+ *
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
+ *
+ * FIX 1 — Missing scroll-lock (Task 3, "Scroll Lock" item):
+ *   This modal previously ONLY had an ESC-key listener. Unlike every other
+ *   modal in the app (experience, certificates, contact, gallery, research),
+ *   it never set document.body.style.overflow = "hidden". That means a user
+ *   could open Education and still scroll the page behind it — which is
+ *   exactly the "feels like a broken app" problem you flagged. Added the
+ *   same lock/unlock pattern used everywhere else, for consistency.
+ *
+ * FIX 2 — Natural German "Enterprise" terminology (Task 2):
+ *   "In Bearbeitung" is functional but reads like an internal ticket status,
+ *   not how a DACH professional describes an ongoing degree on a CV/portfolio.
+ *   Changed to "Laufend" (in progress / ongoing) for the in-progress degree,
+ *   which is the standard term used on German CVs and LinkedIn profiles for
+ *   "currently pursuing." "Abgeschlossen" (completed) for finished items is
+ *   already correct DACH-standard terminology and is left unchanged.
+ *
+ * FIX 3 — Dark mode gradient contrast (Task 1):
+ *   Header title gradient now includes lighter dark: stops.
  */
 
 "use client";
 
 import { useEffect } from "react";
 import { GraduationCap, Calendar, MapPin, Award } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Language } from "@/lib/data";
 import ModalHeader from "@/components/ui/modal-header";
@@ -21,12 +40,17 @@ export default function EducationModal({
   language,
   onClose,
 }: EducationModalProps) {
+  // ── FIX: added scroll-lock, matching pattern used by every other modal ──
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
   }, [onClose]);
 
   const content = {
@@ -37,7 +61,10 @@ export default function EducationModal({
       en: "My academic journey from multimedia design to applied IT",
       de: "Meine akademische Reise von Multimedia-Design bis zur angewandten IT",
     },
-    current: { en: "Currently Pursuing", de: "Derzeit im Studium" },
+    // "Laufend" = standard DACH term for "ongoing / in progress" on a CV.
+    // Previously "In Bearbeitung" (lit. "being processed") — reads like a
+    // support ticket status, not natural professional German.
+    current: { en: "Currently Pursuing", de: "Laufend" },
     education: [
       {
         degree: {
@@ -48,9 +75,12 @@ export default function EducationModal({
         location: "Kampala, Uganda",
         period: {
           en: "Expected January 2027",
-          de: "Erwarteter Abschluss Januar 2027",
+          de: "Voraussichtlicher Abschluss Januar 2027",
         },
-        status: { en: "In Progress", de: "In Bearbeitung" },
+        // ── FIX: status label for the in-progress degree ──
+        // "In Bearbeitung" → "Laufend". This is the field shown as the
+        // colored pill badge at the top of each education card.
+        status: { en: "In Progress", de: "Laufend" },
         description: {
           en: "Advancing technical skills in software development, cloud computing, and IT infrastructure management. Currently working on final year project focused on enterprise systems.",
           de: "Weiterentwicklung technischer Fähigkeiten in Softwareentwicklung, Cloud Computing und IT-Infrastrukturmanagement.",
@@ -98,10 +128,10 @@ export default function EducationModal({
 
   return (
     <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* ── MOBILE-SAFE HEADER ── */}
+      {/* ── MOBILE-SAFE HEADER (with dark-mode-safe gradient) ── */}
       <ModalHeader
         title={content.headerTitle[language]}
-        gradientClass="from-blue-600 via-purple-600 to-pink-600"
+        gradientClass="from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-300 dark:to-pink-400"
         backLabel={content.backButton[language]}
         onBack={onClose}
       />

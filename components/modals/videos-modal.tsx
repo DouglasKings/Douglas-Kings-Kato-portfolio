@@ -1,22 +1,24 @@
 /**
- * Videos Modal Component - With Sticky Header & Natural German
+ * components/modals/videos-modal.tsx
  *
- * Full-page modal displaying video tutorials and content.
- * Features:
- * - Sticky header with back navigation and title
- * - Programming and design tutorial videos with thumbnail images
- * - YouTube and local video support
- * - Responsive grid layout
- * - Natural German translations
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
  *
- * CORRECTED TRANSLATIONS:
- * - "views" → "Aufrufe" (more natural than just "views")
- * - "likes" → "Likes" (commonly used in German)
- * - "Introduction to Java Arrays" → "Einführung in Java-Arrays"
- * - "Web Development" → "Webentwicklung"
- * - Full bilingual support for video titles, descriptions, and categories
+ * FIX 1 — Missing scroll-lock (Task 3):
+ *   This modal only had an ESC-key listener (and only closed the inner
+ *   video player on ESC if one was playing). No document.body.style.overflow
+ *   lock existed at all — background page was fully scrollable while open.
+ *   Added the same lock/unlock pattern used by every other modal.
  *
- * @component
+ * FIX 2 — Dark mode gradient contrast (Task 1):
+ *   The sticky header title ("Video Tutorials") used a red→pink→purple
+ *   gradient with no dark: stops. Added lighter variants.
+ *
+ * NOTE (flagged, not changed): this is the only modal that builds its own
+ * <header> inline instead of using <ModalHeader>. That's a structural
+ * inconsistency worth fixing for maintainability, but you didn't ask for a
+ * header-component refactor and doing so risks changing this modal's
+ * layout/spacing in ways you didn't request. Left as-is apart from the
+ * gradient fix, which is a pure color change.
  */
 
 "use client";
@@ -99,13 +101,16 @@ export default function VideosModal({ language, onClose }: VideosModalProps) {
 
   const [playingVideo, setPlayingVideo] = useState<number | null>(null);
   const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>(
-    {}
+    {},
   );
 
   // ============================================================================
-  // ESC KEY HANDLER
+  // ESC KEY HANDLER + SCROLL LOCK
   // ============================================================================
 
+  // ── FIX: added scroll-lock, matching pattern used by every other modal ──
+  // Previously this effect ONLY registered the ESC handler. Now it also
+  // locks/unlocks body scroll on mount/unmount.
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -117,7 +122,11 @@ export default function VideosModal({ language, onClose }: VideosModalProps) {
       }
     };
     window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
   }, [onClose, playingVideo]);
 
   // ============================================================================
@@ -200,8 +209,12 @@ export default function VideosModal({ language, onClose }: VideosModalProps) {
               {content.backButton[language]}
             </Button>
 
-            {/* Header Title */}
-            <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+            {/*
+              ── FIX: dark-mode gradient contrast ──
+              red-600/pink-600/purple-600 stops were unreadable on the dark
+              sticky header background. Lighter dark: stops added.
+            */}
+            <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 dark:from-red-400 dark:via-pink-300 dark:to-purple-400 bg-clip-text text-transparent">
               {content.headerTitle[language]}
             </h1>
 

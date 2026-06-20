@@ -1,6 +1,23 @@
 /**
  * components/modals/skills-modal.tsx
- * MOBILE FIX: Uses <ModalHeader>. All content unchanged.
+ *
+ * ── CHANGES IN THIS VERSION ──────────────────────────────────────────────
+ *
+ * FIX 1 — Missing scroll-lock (Task 3):
+ *   Like education-modal.tsx, this only had an ESC-key listener with no
+ *   document.body.style.overflow lock. Added the standard pattern.
+ *
+ * FIX 2 — Dark mode gradient contrast (Task 1):
+ *   The big "Technical Skills" h2 title used a blue→purple→pink gradient
+ *   with no dark: stops — added lighter variants. The skill-category
+ *   gradients (per-card icon backgrounds and percentage text) were left
+ *   alone on purpose: those already sit on a tinted card background
+ *   (bgLight / bgDark per category), not directly on the page background,
+ *   so their existing contrast is fine and changing them would make the
+ *   per-category color coding inconsistent with skills-section.tsx.
+ *
+ * No other logic changed — skill data, percentages, and the
+ * .skill-progress-fill CSS-variable pattern are untouched.
  */
 
 "use client";
@@ -17,12 +34,17 @@ interface SkillsModalProps {
 }
 
 export default function SkillsModal({ language, onClose }: SkillsModalProps) {
+  // ── FIX: added scroll-lock, matching pattern used by every other modal ──
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
   }, [onClose]);
 
   const content = {
@@ -139,7 +161,7 @@ export default function SkillsModal({ language, onClose }: SkillsModalProps) {
     <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
       <ModalHeader
         title={content.headerTitle[language]}
-        gradientClass="from-blue-600 via-purple-600 to-pink-600"
+        gradientClass="from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-300 dark:to-pink-400"
         backLabel={content.backButton[language]}
         onBack={onClose}
       />
@@ -149,7 +171,12 @@ export default function SkillsModal({ language, onClose }: SkillsModalProps) {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl mb-6 shadow-lg">
             <Code className="w-10 h-10 text-purple-600 dark:text-purple-400" />
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          {/*
+            ── FIX: dark-mode gradient contrast ──
+            Page-level h2 title sits directly on bg-white/dark:bg-slate-950,
+            so it needs lighter stops to stay readable at night.
+          */}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-300 dark:to-pink-400 bg-clip-text text-transparent">
             {content.title[language]}
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
